@@ -1,5 +1,7 @@
 from django.core.validators import RegexValidator
+from django.conf import settings
 from django.core.mail import send_mail, mail_admins
+from django.template.loader import render_to_string
 from django.utils.text import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.base_user import AbstractBaseUser
@@ -22,7 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(verbose_name='Фамилия', max_length=100)
     postal_code = models.CharField(
         max_length=6,
-        validators=[RegexValidator('^[0-9]{6}$', _('Invalid postal code'))], )
+        validators=[RegexValidator('^[0-9]{5,6}$', _('Invalid postal code'))], )
     city = models.CharField('Город', max_length=150)
     phone = PhoneNumberField(null=False, blank=False, unique=True)
 
@@ -33,10 +35,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            mail_admins('new user',
-                        'new_user: {}'.format(self.email))
-            send_mail('Registration', 'You login {}'.format(self.email), 'admin@domen.ru',
-                      [self.email], )
+            send_mail(subject='Новый пользователь',
+                      from_email=settings.DEFAULT_FROM_EMAIL,
+                      recipient_list=settings.MANAGERS_LIST_EMAIL,
+                        message='',
+                        html_message=render_to_string('letters/notification_admins.html',
+                                                      {'user': self}))
+            send_mail(subject='Успешная регистрация', message='',
+                      html_message=render_to_string('letters/success_registration.html',
+                                                    {'user': self}),
+                      from_email=settings.DEFAULT_FROM_EMAIL,
+                      recipient_list=[self.email])
         super(CustomUser, self).save(*args, **kwargs)
 
     def get_short_name(self):
