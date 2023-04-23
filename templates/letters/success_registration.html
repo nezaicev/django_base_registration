@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+
 <div> Вы зареристрированы!</div>
 <div>
-  Ваш email : {{ name }}
-
+  <p>Ваш email : {{user.email}}</p>
+  <p>
+    Для восстановления пароля, можно пройти по <a href="{% url 'password_reset' %}">ссылке</a>
+  </p>
 </div>
 
-</body>
-</html>

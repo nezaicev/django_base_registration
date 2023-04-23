@@ -11,6 +11,14 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+from environs import Env
+from dotenv import load_dotenv
+
+load_dotenv()
+env = Env()
+env.read_env()
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -136,10 +144,20 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL', 'admin@domen.ru')
+SERVER_EMAIL='test@mail.ru'
 
-
-ADMINS=[("Volk", "nezaicev@yandex.ru"), ("Ivan", "ivan@test.com")]
+MANAGERS_LIST_EMAIL=['volkovas@mosmetod.ru',]
 
 LOGIN_REDIRECT_URL = '/users/profile'
 LOGOUT_REDIRECT_URL = 'login'
+
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'bla_bla@domen.ru')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+
